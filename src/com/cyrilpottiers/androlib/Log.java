@@ -3,7 +3,6 @@ package com.cyrilpottiers.androlib;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 
 public final class Log {
     private final static int MAX_LENGTH = (4 * 1024 - 512);
@@ -43,7 +42,8 @@ public final class Log {
                 return;
             }
             else {
-                print(type, tag, sb.append(prefix).append(message.substring(i, i + MAX_LENGTH)).toString());
+                print(type, tag, sb.append(prefix).append(message.substring(i, i
+                    + MAX_LENGTH)).toString());
                 prefix = "      ";
                 i += MAX_LENGTH;
             }
