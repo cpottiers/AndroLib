@@ -59,7 +59,7 @@ public final class Log {
                 LOGGING = signature.contains("Android Debug");
             }
         }
-        catch (NameNotFoundException e1) {
+        catch (Exception e1) {
             e1.printStackTrace();
         }
     }

@@ -48,6 +48,28 @@ public class CacheFileUtils {
 //        singleton.context = context;
         singleton.cacheDir = context.getCacheDir();
     }
+
+    public static void appendDebugFile(String name, String buffer) {
+        if(!Log.isDebugging()) return;
+        
+        File file = new File(singleton.cacheDir, name);
+        try {
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(DateFormatter.format(Calendar.getInstance().getTime()));
+            bw.write('\n');
+            bw.write(buffer);
+            bw.write('\n');
+            bw.close();
+            fw.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     public static void writeDebugFile(String name, String buffer) {
         if(!Log.isDebugging()) return;
@@ -70,6 +92,26 @@ public class CacheFileUtils {
             e.printStackTrace();
         }
         
+    }
+    
+    public static void appendBinDebugFile(String name, byte[] buffer) {
+        if(!Log.isDebugging()) return;
+        File file = new File(singleton.cacheDir, name);
+        try {
+            FileOutputStream fos = new FileOutputStream(file, true);
+            fos.write(DateFormatter.format(Calendar.getInstance().getTime()).getBytes());
+            fos.write('\n');
+            fos.write(buffer);
+            fos.write('\n');
+            fos.flush();
+            fos.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void writeBinDebugFile(String name, byte[] buffer) {
