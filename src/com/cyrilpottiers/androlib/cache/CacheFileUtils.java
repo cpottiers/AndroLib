@@ -23,18 +23,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import com.cyrilpottiers.androlib.Log;
 import com.cyrilpottiers.androlib.date.DateFormatter;
 
 public class CacheFileUtils {
-    private final static String         LOG            = "CacheFileUtils";
+    private final static String         BIN_DEBUG_FILE = "log.bin";
+    private final static String         DEBUG_FILE     = "log.txt";
+    private final static String         ERROR_FILE     = "error.txt";
 
     private final static String         suffixe        = ".tmp";
     private final static String         suffixeDesc    = ".desc";
     private final static int            IO_BUFFER_SIZE = 8 * 1024;
     private final static int            MAX_FILE_SIZE  = 1024 * 1024;
     private final static CacheFileUtils singleton      = new CacheFileUtils();
-//    private Context                     context        = null;
+    //    private Context                     context        = null;
     private File                        cacheDir       = null;
 
     private CacheFileUtils() {
@@ -45,13 +46,72 @@ public class CacheFileUtils {
     }
 
     public static void instantiateCacheFile(Context context) {
-//        singleton.context = context;
+        //        singleton.context = context;
         singleton.cacheDir = context.getCacheDir();
     }
 
+    public static void clearErrorFile() {
+        File file = new File(singleton.cacheDir, ERROR_FILE);
+        file.delete();
+    }
+
+    public static void appendErrorFile(Throwable tr) {
+        if (tr == null) return;
+
+        File file = new File(singleton.cacheDir, ERROR_FILE);
+        try {
+            FileWriter fw = new FileWriter(file, true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(DateFormatter.format(Calendar.getInstance().getTime()));
+            bw.write(':');
+            bw.write(android.util.Log.getStackTraceString(tr));
+            bw.write('\n');
+            bw.close();
+            fw.close();
+        }
+        catch (FileNotFoundException e) {
+        }
+        catch (IOException e) {
+        }
+    }
+
+    public static String readErrorFile() {
+        File file = new File(singleton.cacheDir, ERROR_FILE);
+        StringBuilder sb = new StringBuilder();
+        try {
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = null;
+            while (null != (line = br.readLine())) {
+                sb.append(line).append('\n');
+            }
+            if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
+            br.close();
+            fr.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public static void clearDebugFile() {
+        clearDebugFile(DEBUG_FILE);
+    }
+
+    public static void clearDebugFile(String name) {
+        File file = new File(singleton.cacheDir, name);
+        file.delete();
+    }
+
+    public static void appendDebugFile(String buffer) {
+        appendDebugFile(DEBUG_FILE, buffer);
+    }
+
     public static void appendDebugFile(String name, String buffer) {
-        if(!Log.isDebugging()) return;
-        
         File file = new File(singleton.cacheDir, name);
         try {
             FileWriter fw = new FileWriter(file, true);
@@ -64,18 +124,18 @@ public class CacheFileUtils {
             fw.close();
         }
         catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
         catch (IOException e) {
-            e.printStackTrace();
         }
     }
-    
+
+    public static void writeDebugFile(String buffer) {
+        writeDebugFile(DEBUG_FILE, buffer);
+    }
+
     public static void writeDebugFile(String name, String buffer) {
-        if(!Log.isDebugging()) return;
-        
         File file = new File(singleton.cacheDir, name);
-        if(file.exists()) file.delete();
+        if (file.exists()) file.delete();
         try {
             FileWriter fw = new FileWriter(file);
             BufferedWriter bw = new BufferedWriter(fw);
@@ -91,11 +151,41 @@ public class CacheFileUtils {
         catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
-    
+
+    public static String readDebugFile() {
+        return readDebugFile(DEBUG_FILE);
+    }
+
+    public static String readDebugFile(String name) {
+        File file = new File(singleton.cacheDir, name);
+        StringBuilder sb = new StringBuilder();
+        try {
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            String line = null;
+            while (null != (line = br.readLine())) {
+                sb.append(line).append('\n');
+            }
+            if (sb.length() > 0) sb.deleteCharAt(sb.length() - 1);
+            br.close();
+            fr.close();
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public static void appendBinDebugFile(byte[] buffer) {
+        appendBinDebugFile(BIN_DEBUG_FILE, buffer);
+    }
+
     public static void appendBinDebugFile(String name, byte[] buffer) {
-        if(!Log.isDebugging()) return;
         File file = new File(singleton.cacheDir, name);
         try {
             FileOutputStream fos = new FileOutputStream(file, true);
@@ -114,8 +204,11 @@ public class CacheFileUtils {
         }
     }
 
+    public static void writeBinDebugFile(byte[] buffer) {
+        writeBinDebugFile(BIN_DEBUG_FILE, buffer);
+    }
+
     public static void writeBinDebugFile(String name, byte[] buffer) {
-        if(!Log.isDebugging()) return;
         File file = new File(singleton.cacheDir, name);
         if (file.exists()) file.delete();
         try {
@@ -134,35 +227,9 @@ public class CacheFileUtils {
         }
     }
 
-    public static String readDebugFile(String name) {
-        File file = new File(singleton.cacheDir, name);
-        StringBuilder sb = new StringBuilder();
-        try {
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
-            String line = null;
-            while (null != (line = br.readLine())) {
-                sb.append(line).append('\n');
-            }
-            if (sb.length() > 0)
-                sb.deleteCharAt(sb.length() - 1);
-            br.close();
-            fr.close();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
     public static boolean cacheURLFile(String uri, String id,
             HashMap<String, String> desc) {
         boolean succeed = true;
-
-        Log.i(LOG, "cache pattern=" + uri);
 
         File file = new File(singleton.cacheDir, new StringBuilder().append(id).append(CacheFileUtils.suffixe).toString());
         File fileDesc = null;
@@ -217,8 +284,6 @@ public class CacheFileUtils {
     public static boolean cacheLocalFile(Bitmap bmp, String id,
             HashMap<String, String> desc) {
         boolean succeed = true;
-
-        Log.i(LOG, "cache local");
 
         File file = new File(singleton.cacheDir, new StringBuilder().append(id).append(CacheFileUtils.suffixe).toString());
         File fileDesc = null;

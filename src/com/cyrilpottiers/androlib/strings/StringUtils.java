@@ -12,8 +12,6 @@ import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.view.View;
 
-import com.cyrilpottiers.androlib.Log;
-
 /**
  * <p>
  * Divers operations for <code>String</code>s.
@@ -23,7 +21,6 @@ import com.cyrilpottiers.androlib.Log;
  */
 
 public class StringUtils {
-    private final static String LOG = "StringUtils";
 
     /**
      * <p>
@@ -85,22 +82,22 @@ public class StringUtils {
         // lookup [[...]]
         int beginString = 0, beginResult = 0;
         boolean b = true;
-        Log.v(LOG, "-------------------------------------");
-        Log.v(LOG, "formatSpan string=" + pattern);
+//        Log.v(LOG, "-------------------------------------");
+//        Log.v(LOG, "formatSpan string=" + pattern);
         while (b) {
             int i = pattern.indexOf("[[", beginString);
             int j = pattern.indexOf("]]", i);
             int k = pattern.indexOf("[[", j);
             int l = pattern.indexOf("]]", k);
 
-            Log.v(LOG, "begin =" + beginString + " i=" + i + " j=" + j + " k=" + k + " l=" + l);
+//            Log.v(LOG, "begin =" + beginString + " i=" + i + " j=" + j + " k=" + k + " l=" + l);
 
             if (i >= 0 && j >= 0) {
                 sb.append(pattern.substring(beginString, i));
                 beginResult = sb.length();
                 // detection style
                 String inner = pattern.substring(i + 2, j);
-                Log.v(LOG, "    inner=" + inner);
+//                Log.v(LOG, "    inner=" + inner);
                 String[] inners = inner.split(",");
                 // eof
                 if (k < 0 || l < 0) {
@@ -112,10 +109,10 @@ public class StringUtils {
                     sb.append(pattern.substring(j + 2, k));
                     l = beginResult + k - (j + 2);
                 }
-                Log.v(LOG, "    l'=" + l);
+//                Log.v(LOG, "    l'=" + l);
                 for (String v : inners) {
                     v = v.trim();
-                    Log.v(LOG, "    keyvalue=" + v);
+//                    Log.v(LOG, "    keyvalue=" + v);
                     SpanStyle sStyle = new SpanStyle();
                     if (v.startsWith("textcolor")) {
                         j = v.indexOf("=");
@@ -128,7 +125,7 @@ public class StringUtils {
                             catch (NumberFormatException e) {
                                 e.printStackTrace();
                             }
-                            Log.v(LOG, "    value t=" + v + " n=" + j);
+//                            Log.v(LOG, "    value t=" + v + " n=" + j);
                             sStyle.whats = new ForegroundColorSpan(j);
                         }
                     }
@@ -143,7 +140,7 @@ public class StringUtils {
                             catch (NumberFormatException e) {
                                 e.printStackTrace();
                             }
-                            Log.v(LOG, "    value t=" + v + " n=" + j);
+//                            Log.v(LOG, "    value t=" + v + " n=" + j);
                             sStyle.whats = new BackgroundColorSpan(j);
                         }
                     }
@@ -164,7 +161,7 @@ public class StringUtils {
                             catch (NumberFormatException e) {
                                 e.printStackTrace();
                             }
-                            Log.v(LOG, "    value t=" + v + " n=" + j);
+//                            Log.v(LOG, "    value t=" + v + " n=" + j);
                             sStyle.whats = new ImageSpan(context,j);
                         }
                     }
@@ -181,7 +178,7 @@ public class StringUtils {
                     sStyle.end = l;
                     sStyle.flags = Spannable.SPAN_EXCLUSIVE_EXCLUSIVE;
                     if (sStyle.end > sStyle.start) spans.add(sStyle);
-                    Log.v(LOG, "    whats=" + sStyle.whats + " start=" + sStyle.start+" end="+sStyle.end);
+//                    Log.v(LOG, "    whats=" + sStyle.whats + " start=" + sStyle.start+" end="+sStyle.end);
                 }
             }
             else {
@@ -191,7 +188,7 @@ public class StringUtils {
             beginString = k;
         }
 
-        Log.v(LOG, "endstring=" + sb.toString());
+//        Log.v(LOG, "endstring=" + sb.toString());
         return sb.toString();
     }
 
